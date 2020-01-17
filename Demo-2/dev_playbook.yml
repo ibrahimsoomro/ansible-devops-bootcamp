@@ -1,0 +1,30 @@
+- hosts: dev_servers
+  roles:
+     - common
+     - dev
+  strategy: free
+  become: yes
+
+  vars:
+     packages: ["git", "curl", "nodejs", "unzip"]
+
+  tasks:
+     - name: Install Dependencies
+       apt: name={{ packages }} state=latest
+
+     - name: Package Application
+       unarchive:
+          src: ./nodejs.zip
+          dest: ~/
+
+     - name: Install PM2
+       npm:
+          name: pm2
+          global: yes
+
+     - name: Start NodeJS Application
+       shell: "pm2 start ./nodejs/pm2.config.js --env {{NODE_ENV}}"
+       notify:
+          - notify slack
+       register: result
+     - debug: var=result

@@ -1,0 +1,25 @@
+- name: Get NodeJS Binaries
+  get_url:
+     url: https://deb.nodesource.com/setup_12.x
+     dest: "./nodejs.sh"
+  register: result
+- debug: var=result
+
+- name: Set Execution Permission
+  file:
+     path: "./nodejs.sh"
+     mode: "u+x"
+  register: result
+- debug: var=result
+
+- name: Execute NodeJs Binaries
+  shell: "./nodejs.sh"
+  register: result
+- debug: var=result
+
+- name: Remove Binaries
+  file:
+     path: "./nodejs.sh"
+     state: absent
+  register: result
+- debug: var=result

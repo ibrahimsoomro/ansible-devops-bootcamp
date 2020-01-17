@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+   appserver:
+      image: nginx:alpine
+      container_name: app_server
+      restart: unless-stopped
+      tty: true
+      volumes:
+         - ./:/var/www
+         - ./nginx/conf.d/:/etc/nginx/conf.d/
+      ports:
+         - "8080:80"
+      depends_on:
+         - app-node-1
+         - app-node-2
+
+   app-node-1:
+      build:
+         context: ./
+         dockerfile: Dockerfile
+      container_name: app_node_1
+      restart: always
+      ports:
+         - "3001:80"
+         - "32781:22"
+
+   app-node-2:
+      build:
+         context: ./
+         dockerfile: Dockerfile
+      container_name: app_node_2
+      restart: always
+      ports:
+         - "3002:80"
+         - "32782:22"

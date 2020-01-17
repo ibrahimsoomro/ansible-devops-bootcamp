@@ -1,0 +1,70 @@
+version: "3"
+
+services:
+   webserver-1:
+      image: nginx:alpine
+      container_name: dev_server
+      restart: unless-stopped
+      tty: true
+      volumes:
+         - ./:/var/www
+         - ./nginx/dev_conf.d/:/etc/nginx/conf.d/
+      ports:
+         - "8081:80"
+      depends_on:
+         - node-1
+         - node-2
+
+   webserver-2:
+      image: nginx:alpine
+      container_name: stage_server
+      restart: unless-stopped
+      tty: true
+      volumes:
+         - ./:/var/www
+         - ./nginx/stage_conf.d/:/etc/nginx/conf.d/
+      ports:
+         - "8082:80"
+      depends_on:
+         - node-3
+         - node-4
+
+   node-1:
+      build:
+         context: ./
+         dockerfile: Dockerfile
+      container_name: dev_node_1
+      restart: always
+      ports:
+         - "3003:80"
+         - "32783:22"
+
+   node-2:
+      build:
+         context: ./
+         dockerfile: Dockerfile
+      container_name: dev_node_2
+      restart: always
+      ports:
+         - "3004:80"
+         - "32784:22"
+
+   node-3:
+      build:
+         context: ./
+         dockerfile: Dockerfile
+      container_name: stage_node_1
+      restart: always
+      ports:
+         - "3005:80"
+         - "32785:22"
+
+   node-4:
+      build:
+         context: ./
+         dockerfile: Dockerfile
+      container_name: stage_node_2
+      restart: always
+      ports:
+         - "3006:80"
+         - "32786:22"

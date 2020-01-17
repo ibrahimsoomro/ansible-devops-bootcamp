@@ -1,0 +1,61 @@
+- hosts: servers
+  strategy: free
+  become: yes
+
+  vars:
+     packages: ["git", "curl", "nodejs", "unzip"]
+
+  tasks:
+     - name: Get NodeJS Binaries
+       get_url:
+         url: https://deb.nodesource.com/setup_12.x
+         dest: "./nodejs.sh"
+       register: result
+     - debug: var=result
+
+     - name: Set Execution Permission
+       file:
+         path: "./nodejs.sh"
+         mode: "u+x"
+       register: result
+     - debug: var=result
+
+     - name: Execute NodeJs Binaries
+       shell: "./nodejs.sh"
+       register: result
+     - debug: var=result
+
+     - name: Remove Binaries
+       file:
+         path: "./nodejs.sh"
+         state: absent
+       register: result
+     - debug: var=result
+
+     - name: Install Dependencies
+       apt: name={{ packages }} state=latest
+
+     - name: Package Application
+       unarchive:
+         src: ./nodejs.zip
+         dest: ~/
+
+     - name: Install PM2
+       npm:
+         name: pm2
+         global: yes
+
+     - name: Start NodeJS Application
+       shell: "pm2 start ./nodejs/pm2.config.js --env development"
+       notify:
+          - notify slack
+       register: result
+     - debug: var=result
+
+  handlers:
+     - name: notify slack
+       slack:
+          token: TRVS5NESV/BSB6LFG6B/hbQhU5SFHVSnEl59eZ8Oyo6g
+          msg: Test Notification from Ansible {{inventory_hostname}}
+       become: yes
+       become_method: su

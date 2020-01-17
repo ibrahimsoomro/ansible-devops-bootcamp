@@ -1,0 +1,6 @@
+- name: notify slack
+  slack:
+     token: TRVS5NESV/BSB6LFG6B/hbQhU5SFHVSnEl59eZ8Oyo6g
+     msg: Test Notification from Ansible {{inventory_hostname}}
+  become: yes
+  become_method: su
